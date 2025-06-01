@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us - 3D Interactive Banner</title>
+    <title>about page</title>
     <style>
         body {
             margin: 0;
@@ -161,14 +161,14 @@
     <div id="banner-container">
         <canvas id="banner-canvas"></canvas>
         <div class="banner-overlay">
-            <!-- <h1>About Our SQUAD</h1>
-            <p>.</p> -->
+             <h1>About Our SQUAD</h1>
+            <!--<p>.</p> -->
         </div>
         <div class="scroll-indicator">↓</div>
     </div>
     
     <div class="content-section">
-        <h2>About Us</h2>
+        <!-- <h2>About Us</h2> -->
         <p>T7 hereby officially recognizes and places significant value on the mastery of seven essential talents in Narrow One: Accuracy, Speed, Parkour, Bow Versatility, PvP IQ, Sportsmanship, and Adaptability. Our conviction is that a player attains the status of a "pro" by demonstrating proficiency in all seven talents. Established by KAIJIN, T7 is a clan dedicated to cultivating a community where members can refine their skills and excel in the various aspects of Narrow One. We remain steadfast in our commitment to promoting excellence, sportsmanship, and camaraderie within our clan.</p>
         
         <h2>Meet the Team</h2>
@@ -252,7 +252,7 @@
             let mixer;
             
             loader.load(
-                './BANA.glb',
+                './Banner.glb',
                 function(gltf) {
                     bannerModel = gltf.scene;
                     scene.add(bannerModel);
@@ -274,12 +274,12 @@
                     const controls = new THREE.OrbitControls(camera, renderer.domElement);
                     controls.enableDamping = true;
                     controls.dampingFactor = 0.05;
-                    controls.minDistance = size * 0.3;
-                    controls.maxDistance = size * 2;
+                    controls.minDistance = size * 0.2;
+                    controls.maxDistance = size * 0.1;
                     controls.maxPolarAngle = Math.PI * 0.9;
                     controls.minPolarAngle = Math.PI * 0.3;
                     controls.autoRotate = true;
-                    controls.autoRotateSpeed = 0.5;
+                    controls.autoRotateSpeed = 0.7;
                     
                     const clock = new THREE.Clock();
                     function animate() {

@@ -3,11 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>about page</title>
+    <title>T7 Clan - Events & Tournaments</title>
     <style>
+        :root {
+            --primary-color: #e74c3c;
+            --secondary-color: #2c3e50;
+            --accent-color: #3498db;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
+        
         body {
             margin: 0;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Poppins', 'Arial', sans-serif;
             color: #333;
             line-height: 1.6;
             background-color: #f8f9fa;
@@ -36,24 +44,27 @@
             left: 0;
             width: 100%;
             padding: 4rem 2rem;
-            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
             color: white;
             z-index: 10;
             pointer-events: none;
+            text-align: center;
         }
         
         .banner-overlay h1 {
             font-size: clamp(2.5rem, 5vw, 4.5rem);
             margin: 0 0 1rem 0;
-            font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            font-weight: 800;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.7);
+            letter-spacing: 1px;
         }
         
         .banner-overlay p {
             font-size: clamp(1rem, 2vw, 1.5rem);
-            margin: 0;
+            margin: 0 auto;
             max-width: 800px;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+            font-weight: 300;
         }
         
         .content-section {
@@ -65,56 +76,118 @@
         .content-section h2 {
             font-size: 2.5rem;
             margin-bottom: 1.5rem;
-            color: #2c3e50;
+            color: var(--secondary-color);
+            text-align: center;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .content-section h2:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--primary-color);
+            border-radius: 2px;
         }
         
         .content-section p {
             font-size: 1.1rem;
             margin-bottom: 2rem;
             color: #555;
+            text-align: center;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
         
-        .bio-grid {
+        .events-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
             margin-top: 3rem;
         }
         
-        .bio-card {
+        .event-card {
             background: white;
             border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
             overflow: hidden;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .bio-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
-        }
-        
-        .bio-image {
-            height: 300px;
-            background: #f0f0f0;
             position: relative;
         }
         
-        .bio-content {
+        .event-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+        }
+        
+        .event-image {
+            height: 200px;
+            background: linear-gradient(45deg, #2c3e50, #4ca1af);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .event-type {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .event-content {
             padding: 1.5rem;
         }
         
-        .bio-content h3 {
+        .event-content h3 {
             margin: 0 0 0.5rem 0;
-            color: #2c3e50;
+            color: var(--secondary-color);
             font-size: 1.5rem;
         }
         
-        .bio-content .role {
-            color: #e74c3c;
+        .event-date {
+            color: var(--primary-color);
             font-weight: 600;
             margin-bottom: 1rem;
             display: block;
+            font-size: 0.9rem;
+        }
+        
+        .event-details {
+            color: #666;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+        
+        .event-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #777;
+        }
+        
+        .event-stats span {
+            display: flex;
+            align-items: center;
+        }
+        
+        .event-stats i {
+            margin-right: 5px;
+            color: var(--accent-color);
         }
         
         .scroll-indicator {
@@ -142,6 +215,14 @@
             }
         }
         
+        .section-divider {
+            height: 100px;
+            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+            margin: 3rem 0;
+            position: relative;
+            clip-path: polygon(0 0, 100% 0, 100% 70%, 0 100%);
+        }
+        
         @media (max-width: 768px) {
             #banner-container {
                 height: 80vh;
@@ -151,29 +232,32 @@
                 padding: 2rem 1rem;
             }
             
-            .bio-grid {
+            .events-grid {
                 grid-template-columns: 1fr;
             }
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div id="banner-container">
         <canvas id="banner-canvas"></canvas>
         <div class="banner-overlay">
-             <h1>About Our SQUAD</h1>
-            <!--<p>.</p> -->
+             <h1>T7 CLAN EVENTS</h1>
+             <p>Competitive tournaments and clan activities</p>
         </div>
         <div class="scroll-indicator">↓</div>
     </div>
     
     <div class="content-section">
-        <!-- <h2>About Us</h2> -->
-        <p>T7 hereby officially recognizes and places significant value on the mastery of seven essential talents in Narrow One: Accuracy, Speed, Parkour, Bow Versatility, PvP IQ, Sportsmanship, and Adaptability. Our conviction is that a player attains the status of a "pro" by demonstrating proficiency in all seven talents. Established by KAIJIN, T7 is a clan dedicated to cultivating a community where members can refine their skills and excel in the various aspects of Narrow One. We remain steadfast in our commitment to promoting excellence, sportsmanship, and camaraderie within our clan.</p>
+        <p>T7 hereby officially recognizes and places significant value on the mastery of seven essential talents in Narrow One: Accuracy, Speed, Parkour, Bow Versatility, PvP IQ, Sportsmanship, and Adaptability. Our conviction is that a player attains the status of a "pro" by demonstrating proficiency in all seven talents.</p>
         
-        <h2>Meet the Team</h2>
-        <div class="bio-grid" id="team-members">
-            <!-- Bio cards will be added dynamically -->
+        <div class="section-divider"></div>
+        
+        <h2>Upcoming Events & Tournaments</h2>
+        <div class="events-grid" id="events-container">
+            <!-- Event cards will be added dynamically -->
         </div>
     </div>
 
@@ -208,43 +292,53 @@
             
             // Add skybox/environment
             function createSkybox() {
-                const skyGeometry = new THREE.SphereGeometry(500, 32, 32);
-                const skyMaterial = new THREE.MeshBasicMaterial({
-                    color: 0x87CEEB,
-                    side: THREE.BackSide,
-                    fog: true
-                });
-                const sky = new THREE.Mesh(skyGeometry, skyMaterial);
-                scene.add(sky);
-                
-                scene.fog = new THREE.FogExp2(0x87CEEB, 0.001);
-            }
-            createSkybox();
-            
-            // Enhanced lighting setup
-            function setupLighting() {
-                const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-                scene.add(ambientLight);
-                
-                const sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
-                sunLight.position.set(1, 1, 1);
-                sunLight.castShadow = true;
-                sunLight.shadow.mapSize.width = 1024;
-                sunLight.shadow.mapSize.height = 1024;
-                scene.add(sunLight);
-                
-                const fillLight = new THREE.DirectionalLight(0xffffff, 0.5);
-                fillLight.position.set(-1, 0.5, -1);
-                scene.add(fillLight);
-                
-                const backLight = new THREE.DirectionalLight(0xffffff, 0.3);
-                backLight.position.set(0, 0.5, -1);
-                scene.add(backLight);
-                
-                const hemisphereLight = new THREE.HemisphereLight(0x87CEEB, 0x8B4513, 0.6);
-                scene.add(hemisphereLight);
-            }
-            setupLighting();
+    const skyGeometry = new THREE.SphereGeometry(500, 32, 32);
+    const skyMaterial = new THREE.MeshBasicMaterial({
+        color: 0x87CEEB, // Light sky blue color
+        side: THREE.BackSide,
+        fog: true
+    });
+    const sky = new THREE.Mesh(skyGeometry, skyMaterial);
+    scene.add(sky);
+    
+    // Lighter blue fog to match the sky
+    scene.fog = new THREE.FogExp2(0x87CEEB, 0.001);
+}
+createSkybox();
+
+// Enhanced lighting setup with blue sky adaptation
+function setupLighting() {
+    // Brighter ambient light to match daytime
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+    
+    // Main sunlight - positioned higher for daytime feel
+    const sunLight = new THREE.DirectionalLight(0xffffcc, 1.3); // Slightly yellow tint
+    sunLight.position.set(1, 2, 1); // Higher position
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.width = 1024;
+    sunLight.shadow.mapSize.height = 1024;
+    scene.add(sunLight);
+    
+    // Fill light - softer and cooler
+    const fillLight = new THREE.DirectionalLight(0xccddff, 0.4);
+    fillLight.position.set(-1, 0.5, -1);
+    scene.add(fillLight);
+    
+    // Back light - reduced intensity
+    const backLight = new THREE.DirectionalLight(0xffffff, 0.2);
+    backLight.position.set(0, 0.5, -1);
+    scene.add(backLight);
+    
+    // Hemisphere light - sky blue and light ground
+    const hemisphereLight = new THREE.HemisphereLight(
+        0x87CEEB, // Sky color
+        0xdfebf2, // Light ground color (off-white with blue tint)
+        0.8 // Increased intensity
+    );
+    scene.add(hemisphereLight);
+}
+setupLighting();
             
             // Load your GLB banner model
             const loader = new THREE.GLTFLoader();
@@ -262,7 +356,8 @@
                     bannerModel.position.sub(center);
                     
                     const size = box.getSize(new THREE.Vector3()).length();
-                    camera.position.z = size * 0.5;
+                    camera.position.z = size * 1.5;
+                    camera.position.y = -size * 0.001;
                     
                     if (gltf.animations && gltf.animations.length) {
                         mixer = new THREE.AnimationMixer(bannerModel);
@@ -276,10 +371,11 @@
                     controls.dampingFactor = 0.05;
                     controls.minDistance = size * 0.2;
                     controls.maxDistance = size * 0.1;
-                    controls.maxPolarAngle = Math.PI * 0.9;
+                    controls.maxPolarAngle = Math.PI * 0.7;
                     controls.minPolarAngle = Math.PI * 0.3;
                     controls.autoRotate = true;
                     controls.autoRotateSpeed = 0.7;
+                    controls.target.y = -0.3;
                     
                     const clock = new THREE.Clock();
                     function animate() {
@@ -294,23 +390,24 @@
                 undefined,
                 function(error) {
                     console.error('Error loading banner model:', error);
-                    const geometry = new THREE.BoxGeometry(2, 2, 2);
+                    const geometry = new THREE.TorusKnotGeometry(1, 0.4, 100, 16);
                     const material = new THREE.MeshStandardMaterial({ 
-                        color: 0x00ff00,
-                        metalness: 0.3,
-                        roughness: 0.8
+                        color: 0xe74c3c,
+                        metalness: 0.7,
+                        roughness: 0.3
                     });
-                    const cube = new THREE.Mesh(geometry, material);
-                    scene.add(cube);
+                    const knot = new THREE.Mesh(geometry, material);
+                    scene.add(knot);
                     camera.position.z = 5;
+                    camera.position.y = -1;
                     
                     const controls = new THREE.OrbitControls(camera, renderer.domElement);
                     controls.enableDamping = true;
                     
                     function animate() {
                         requestAnimationFrame(animate);
-                        cube.rotation.x += 0.005;
-                        cube.rotation.y += 0.005;
+                        knot.rotation.x += 0.005;
+                        knot.rotation.y += 0.005;
                         controls.update();
                         renderer.render(scene, camera);
                     }
@@ -334,41 +431,105 @@
             });
         }
         
-        // Team Members Section
-        function initTeamMembers() {
-            const teamMembers = [
+        // Events Section
+        function initEvents() {
+            const events = [
                 {
-                    name: "SYSTUMMM",
-                    role: "PLAYER",
-                    bio: "LEGIT EDITOR",
-                    model: "./member1.glb"
+                    title: "Clan War: T7 vs Shadow",
+                    type: "Clan War",
+                    date: "June 15, 2023",
+                    details: "Intense 5v5 battle against our rivals Shadow clan. Map: Ancient Ruins. Best of 7 matches.",
+                    participants: "10",
+                    prize: "Prestige + $100",
+                    icon: "fa-users"
                 },
                 {
-                    name: "PRATIK",
-                    role: "PRATIK",
-                    bio: "TECH EXPERT",
-                    model: "./member.glb"
+                    title: "Summer Showdown Tournament",
+                    type: "Tournament",
+                    date: "June 22-24, 2023",
+                    details: "Annual summer tournament with 32 competing teams. Double elimination bracket.",
+                    participants: "32",
+                    prize: "Championship + $500",
+                    icon: "fa-trophy"
                 },
                 {
-                    name: "KAIJIN",
-                    role: "PLAYER",
-                    bio: "--",
-                    model: "./member.glb"
+                    title: "Public FFA Event",
+                    type: "Public Event",
+                    date: "June 18, 2023",
+                    details: "Open free-for-all event for all community members. Special modifiers enabled.",
+                    participants: "Unlimited",
+                    prize: "Exclusive Skins",
+                    icon: "fa-gamepad"
+                },
+                {
+                    title: "Clan War: T7 vs Phoenix",
+                    type: "Clan War",
+                    date: "July 5, 2023",
+                    details: "Strategic 4v4 capture point battle. Map: Industrial Zone.",
+                    participants: "8",
+                    prize: "Prestige + Ranking",
+                    icon: "fa-users"
+                },
+                {
+                    title: "1v1 Duel Championship",
+                    type: "Tournament",
+                    date: "July 10-12, 2023",
+                    details: "Individual skill competition. Swiss system with top 8 playoffs.",
+                    participants: "64",
+                    prize: "Golden Weapon + $300",
+                    icon: "fa-trophy"
+                },
+                {
+                    title: "Community Parkour Challenge",
+                    type: "Public Event",
+                    date: "June 30, 2023",
+                    details: "Time-trial parkour course with global leaderboards. New obstacle course design.",
+                    participants: "Unlimited",
+                    prize: "Speedster Title",
+                    icon: "fa-running"
+                },
+                {
+                    title: "Double XP Weekend",
+                    type: "Public Event",
+                    date: "July 1-3, 2023",
+                    details: "Weekend-long double XP for all matches. Special bonus for clan members.",
+                    participants: "Unlimited",
+                    prize: "2x XP",
+                    icon: "fa-bolt"
                 }
             ];
             
-            const grid = document.getElementById('SQUAD MEMBERS');
+            const grid = document.getElementById('events-container');
             
-            teamMembers.forEach(member => {
+            events.forEach(event => {
                 const card = document.createElement('div');
-                card.className = 'bio-card';
+                card.className = 'event-card';
+                
+                // Generate a random gradient for each card
+                const colors = [
+                    'linear-gradient(45deg, #2c3e50, #4ca1af)',
+                    'linear-gradient(45deg, #e74c3c, #e67e22)',
+                    'linear-gradient(45deg, #3498db, #2ecc71)',
+                    'linear-gradient(45deg, #9b59b6, #e74c3c)',
+                    'linear-gradient(45deg, #1abc9c, #3498db)',
+                    'linear-gradient(45deg, #e67e22, #f1c40f)',
+                    'linear-gradient(45deg, #2c3e50, #e74c3c)'
+                ];
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
                 
                 card.innerHTML = `
-                    <div class="bio-image" id="bio-${member.name.toLowerCase().replace(' ', '-')}"></div>
-                    <div class="bio-content">
-                        <h3>${member.name}</h3>
-                        <span class="role">${member.role}</span>
-                        <p>${member.bio}</p>
+                    <div class="event-image" style="background: ${randomColor}">
+                        <i class="fas ${event.icon}"></i>
+                        <span class="event-type">${event.type}</span>
+                    </div>
+                    <div class="event-content">
+                        <h3>${event.title}</h3>
+                        <span class="event-date">${event.date}</span>
+                        <p class="event-details">${event.details}</p>
+                        <div class="event-stats">
+                            <span><i class="fas fa-user-friends"></i> ${event.participants} participants</span>
+                            <span><i class="fas fa-award"></i> ${event.prize}</span>
+                        </div>
                     </div>
                 `;
                 
@@ -379,7 +540,7 @@
         // Initialize everything when the page loads
         window.addEventListener('DOMContentLoaded', () => {
             initBanner();
-            initTeamMembers();
+            initEvents();
         });
     </script>
 </body>

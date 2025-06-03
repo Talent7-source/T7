@@ -223,6 +223,71 @@
             clip-path: polygon(0 0, 100% 0, 100% 70%, 0 100%);
         }
         
+        /* Past Events Section */
+        .past-event {
+            opacity: 0.9;
+        }
+        
+        .past-event .event-image {
+            filter: grayscale(30%);
+        }
+        
+        .past-event .event-type {
+            background: #7f8c8d;
+        }
+        
+        /* Social Buttons Section */
+        .social-section {
+            background-color: var(--secondary-color);
+            padding: 4rem 2rem;
+            text-align: center;
+            color: white;
+        }
+        
+        .social-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .social-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .social-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+        
+        .social-button i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .discord-button {
+            background-color: #5865F2;
+            color: white;
+        }
+        
+        .youtube-button {
+            background-color: #FF0000;
+            color: white;
+        }
+        
+        .instagram-button {
+            background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+            color: white;
+        }
+        
         @media (max-width: 768px) {
             #banner-container {
                 height: 80vh;
@@ -234,6 +299,17 @@
             
             .events-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .social-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .social-button {
+                width: 100%;
+                max-width: 250px;
+                justify-content: center;
             }
         }
     </style>
@@ -256,8 +332,32 @@
         <div class="section-divider"></div>
         
         <h2>Upcoming Events & Tournaments</h2>
-        <div class="events-grid" id="events-container">
-            <!-- Event cards will be added dynamically -->
+        <div class="events-grid" id="upcoming-events-container">
+            <!-- Upcoming event cards will be added dynamically -->
+        </div>
+        
+        <div class="section-divider"></div>
+        
+        <h2>Past Events & Results</h2>
+        <div class="events-grid" id="past-events-container">
+            <!-- Past event cards will be added dynamically -->
+        </div>
+    </div>
+
+    <div class="social-section">
+        <h2>Join Our Community</h2>
+        <p>Connect with us on social media to stay updated with all clan activities</p>
+        
+        <div class="social-buttons">
+            <a href="https://discord.gg/yourinvite" class="social-button discord-button" target="_blank">
+                <i class="fab fa-discord"></i> Join Our Discord
+            </a>
+            <a href="https://youtube.com/yourchannel" class="social-button youtube-button" target="_blank">
+                <i class="fab fa-youtube"></i> Subscribe on YouTube
+            </a>
+            <a href="https://instagram.com/yourprofile" class="social-button instagram-button" target="_blank">
+                <i class="fab fa-instagram"></i> Follow on Instagram
+            </a>
         </div>
     </div>
 
@@ -292,53 +392,53 @@
             
             // Add skybox/environment
             function createSkybox() {
-    const skyGeometry = new THREE.SphereGeometry(500, 32, 32);
-    const skyMaterial = new THREE.MeshBasicMaterial({
-        color: 0x87CEEB, // Light sky blue color
-        side: THREE.BackSide,
-        fog: true
-    });
-    const sky = new THREE.Mesh(skyGeometry, skyMaterial);
-    scene.add(sky);
-    
-    // Lighter blue fog to match the sky
-    scene.fog = new THREE.FogExp2(0x87CEEB, 0.001);
-}
-createSkybox();
+                const skyGeometry = new THREE.SphereGeometry(500, 32, 32);
+                const skyMaterial = new THREE.MeshBasicMaterial({
+                    color: 0x87CEEB, // Light sky blue color
+                    side: THREE.BackSide,
+                    fog: true
+                });
+                const sky = new THREE.Mesh(skyGeometry, skyMaterial);
+                scene.add(sky);
+                
+                // Lighter blue fog to match the sky
+                scene.fog = new THREE.FogExp2(0x87CEEB, 0.001);
+            }
+            createSkybox();
 
-// Enhanced lighting setup with blue sky adaptation
-function setupLighting() {
-    // Brighter ambient light to match daytime
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-    scene.add(ambientLight);
-    
-    // Main sunlight - positioned higher for daytime feel
-    const sunLight = new THREE.DirectionalLight(0xffffcc, 1.3); // Slightly yellow tint
-    sunLight.position.set(1, 2, 1); // Higher position
-    sunLight.castShadow = true;
-    sunLight.shadow.mapSize.width = 1024;
-    sunLight.shadow.mapSize.height = 1024;
-    scene.add(sunLight);
-    
-    // Fill light - softer and cooler
-    const fillLight = new THREE.DirectionalLight(0xccddff, 0.4);
-    fillLight.position.set(-1, 0.5, -1);
-    scene.add(fillLight);
-    
-    // Back light - reduced intensity
-    const backLight = new THREE.DirectionalLight(0xffffff, 0.2);
-    backLight.position.set(0, 0.5, -1);
-    scene.add(backLight);
-    
-    // Hemisphere light - sky blue and light ground
-    const hemisphereLight = new THREE.HemisphereLight(
-        0x87CEEB, // Sky color
-        0xdfebf2, // Light ground color (off-white with blue tint)
-        0.8 // Increased intensity
-    );
-    scene.add(hemisphereLight);
-}
-setupLighting();
+            // Enhanced lighting setup with blue sky adaptation
+            function setupLighting() {
+                // Brighter ambient light to match daytime
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+                scene.add(ambientLight);
+                
+                // Main sunlight - positioned higher for daytime feel
+                const sunLight = new THREE.DirectionalLight(0xffffcc, 1.3); // Slightly yellow tint
+                sunLight.position.set(1, 2, 1); // Higher position
+                sunLight.castShadow = true;
+                sunLight.shadow.mapSize.width = 1024;
+                sunLight.shadow.mapSize.height = 1024;
+                scene.add(sunLight);
+                
+                // Fill light - softer and cooler
+                const fillLight = new THREE.DirectionalLight(0xccddff, 0.4);
+                fillLight.position.set(-1, 0.5, -1);
+                scene.add(fillLight);
+                
+                // Back light - reduced intensity
+                const backLight = new THREE.DirectionalLight(0xffffff, 0.2);
+                backLight.position.set(0, 0.5, -1);
+                scene.add(backLight);
+                
+                // Hemisphere light - sky blue and light ground
+                const hemisphereLight = new THREE.HemisphereLight(
+                    0x87CEEB, // Sky color
+                    0xdfebf2, // Light ground color (off-white with blue tint)
+                    0.8 // Increased intensity
+                );
+                scene.add(hemisphereLight);
+            }
+            setupLighting();
             
             // Load your GLB banner model
             const loader = new THREE.GLTFLoader();
@@ -433,7 +533,7 @@ setupLighting();
         
         // Events Section
         function initEvents() {
-            const events = [
+            const upcomingEvents = [
                 {
                     title: "Clan War: T7 vs Shadow",
                     type: "Clan War",
@@ -469,41 +569,78 @@ setupLighting();
                     participants: "8",
                     prize: "Prestige + Ranking",
                     icon: "fa-users"
-                },
-                {
-                    title: "1v1 Duel Championship",
-                    type: "Tournament",
-                    date: "July 10-12, 2023",
-                    details: "Individual skill competition. Swiss system with top 8 playoffs.",
-                    participants: "64",
-                    prize: "Golden Weapon + $300",
-                    icon: "fa-trophy"
-                },
-                {
-                    title: "Community Parkour Challenge",
-                    type: "Public Event",
-                    date: "June 30, 2023",
-                    details: "Time-trial parkour course with global leaderboards. New obstacle course design.",
-                    participants: "Unlimited",
-                    prize: "Speedster Title",
-                    icon: "fa-running"
-                },
-                {
-                    title: "Double XP Weekend",
-                    type: "Public Event",
-                    date: "July 1-3, 2023",
-                    details: "Weekend-long double XP for all matches. Special bonus for clan members.",
-                    participants: "Unlimited",
-                    prize: "2x XP",
-                    icon: "fa-bolt"
                 }
             ];
             
-            const grid = document.getElementById('events-container');
+            const pastEvents = [
+    {
+        title: "Seasonal Championship 2023",
+        type: "Tournament",
+        date: "December 28, 2023",
+        details: "Seasonal championship with 16 Clan members. 1v1 Tournament with 5K N1 Coins Won Diglet Sencond Place T7 coder Won 3.5K N1 coins and third place T7| randy won 2k N1 Coin",
+        participants: "16",
+        prize: "Victory",
+        icon: "fa-trophy"
+    },
+    {
+        title: "Clan War: T7 vs Fossile Clan",
+        type: "Clan War",
+        date: "December, 2023",
+        details: "Epic 3v3 showdown that went to sudden death overtime. Talent 7 won.",
+        participants: "6",
+        prize: "Victory",
+        icon: "fa-swords" 
+    },
+    {
+        title: "ARCHERS OF THE REALM",
+        type: "Strategic Event",
+        date: "August, 2024",
+        details: "King vs King bow battle with 4 defenders protecting their ruler. Attackers must eliminate defenders before taking down the king. Intense 10-minute matches.",
+        participants: "10",
+        prize: "Victory",
+        icon: "fa-crown" 
+    },
+    {
+        title: "Clan War: Talent7 vs 2 shots Clan",
+        type: "Clan War",
+        date: "December, 2023",
+        details: "Epic 3v3 showdown that went to sudden death overtime. 2 shots won.",
+        participants: "12",
+        prize: "Victory",
+        icon: "fa-swords" 
+    },
+    {
+        title: "ARCHERY OLYMPICS",
+        type: "Public Event",
+        date: "October 15, 2024",
+        details: "6 Epic Rounds With 6 Bows.",
+        participants: "12",
+        prize: "Victory",
+        icon: "fa-bullseye" 
+    },
+    {
+        title: "Seasonal Championship 2024",
+        type: "Tournament",
+        date: "March 20, 2024",
+        details: "Single elimination 1v1 tournament. T7|Kitten Won Tournament And T7|Lichtel are Runner-UP",
+        participants: "16",
+        prize: "Champion",
+        icon: "fa-trophy"
+    },
+    {
+        title: "The Lost City of Eldarath",
+        type: "Adventure Event",
+        date: "January, 2024",
+        details: "1 vs. monster event! Participants battled through castles, forts, and fields across 3 waves. The first 3 kills advanced players to the next level.",
+        participants: "10",
+        prize: "Champion",
+        icon: "fa-dungeon" 
+    }
+];
             
-            events.forEach(event => {
+            function createEventCard(event, isPast = false) {
                 const card = document.createElement('div');
-                card.className = 'event-card';
+                card.className = `event-card ${isPast ? 'past-event' : ''}`;
                 
                 // Generate a random gradient for each card
                 const colors = [
@@ -533,7 +670,19 @@ setupLighting();
                     </div>
                 `;
                 
-                grid.appendChild(card);
+                return card;
+            }
+            
+            // Add upcoming events
+            const upcomingContainer = document.getElementById('upcoming-events-container');
+            upcomingEvents.forEach(event => {
+                upcomingContainer.appendChild(createEventCard(event));
+            });
+            
+            // Add past events
+            const pastContainer = document.getElementById('past-events-container');
+            pastEvents.forEach(event => {
+                pastContainer.appendChild(createEventCard(event, true));
             });
         }
         

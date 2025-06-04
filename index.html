@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>T7 Clan - Events & Tournaments</title>
+    <!-- Preload important resources -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js" as="script">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js" as="script">
+    <link rel="preload" href="./Banner.glb" as="fetch" crossorigin="anonymous">
+    
     <style>
         :root {
             --primary-color: #e74c3c;
@@ -27,6 +32,7 @@
             height: 100vh;
             position: relative;
             overflow: hidden;
+            background-color: #1a1a1a; /* Fallback background */
         }
         
         #banner-canvas {
@@ -236,6 +242,37 @@
             background: #7f8c8d;
         }
         
+        /* Loading State */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--secondary-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
         /* Social Buttons Section */
         .social-section {
             background-color: var(--secondary-color);
@@ -317,6 +354,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
+    <!-- Loading overlay that will be removed when content is ready -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p>Loading T7 Clan Experience...</p>
+    </div>
+    
     <div id="banner-container">
         <canvas id="banner-canvas"></canvas>
         <div class="banner-overlay">
@@ -367,251 +410,252 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
     
     <script>
-        // Main Banner Animation with Enhanced Effects
-        function initBanner() {
-            // Scene setup
-            const container = document.getElementById('banner-container');
-            const canvas = document.getElementById('banner-canvas');
-            
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(
-                45, // Wider field of view
-                container.clientWidth / container.clientHeight, 
-                0.1, 
-                1000
-            );
-            
-            const renderer = new THREE.WebGLRenderer({
-                canvas: canvas,
-                antialias: true,
-                alpha: true
-            });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderer.outputEncoding = THREE.sRGBEncoding;
-            
-            // Add skybox/environment
-            function createSkybox() {
-                const skyGeometry = new THREE.SphereGeometry(500, 32, 32);
-                const skyMaterial = new THREE.MeshBasicMaterial({
-                    color: 0x87CEEB, // Light sky blue color
-                    side: THREE.BackSide,
-                    fog: true
-                });
-                const sky = new THREE.Mesh(skyGeometry, skyMaterial);
-                scene.add(sky);
-                
-                // Lighter blue fog to match the sky
-                scene.fog = new THREE.FogExp2(0x87CEEB, 0.001);
-            }
-            createSkybox();
-
-            // Enhanced lighting setup with blue sky adaptation
-            function setupLighting() {
-                // Brighter ambient light to match daytime
-                const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-                scene.add(ambientLight);
-                
-                // Main sunlight - positioned higher for daytime feel
-                const sunLight = new THREE.DirectionalLight(0xffffcc, 1.3); // Slightly yellow tint
-                sunLight.position.set(1, 2, 1); // Higher position
-                sunLight.castShadow = true;
-                sunLight.shadow.mapSize.width = 1024;
-                sunLight.shadow.mapSize.height = 1024;
-                scene.add(sunLight);
-                
-                // Fill light - softer and cooler
-                const fillLight = new THREE.DirectionalLight(0xccddff, 0.4);
-                fillLight.position.set(-1, 0.5, -1);
-                scene.add(fillLight);
-                
-                // Back light - reduced intensity
-                const backLight = new THREE.DirectionalLight(0xffffff, 0.2);
-                backLight.position.set(0, 0.5, -1);
-                scene.add(backLight);
-                
-                // Hemisphere light - sky blue and light ground
-                const hemisphereLight = new THREE.HemisphereLight(
-                    0x87CEEB, // Sky color
-                    0xdfebf2, // Light ground color (off-white with blue tint)
-                    0.8 // Increased intensity
+        // First, load the GLB file before anything else
+        function loadGLBModel() {
+            return new Promise((resolve, reject) => {
+                const loader = new THREE.GLTFLoader();
+                loader.load(
+                    './Banner.glb',
+                    (gltf) => resolve(gltf),
+                    undefined,
+                    (error) => reject(error)
                 );
-                scene.add(hemisphereLight);
-            }
-            setupLighting();
-            
-            // Load your GLB banner model
-            const loader = new THREE.GLTFLoader();
-            let bannerModel;
-            let mixer;
-            
-            loader.load(
-                './Banner.glb',
-                function(gltf) {
-                    bannerModel = gltf.scene;
-                    scene.add(bannerModel);
-                    
-                    const box = new THREE.Box3().setFromObject(bannerModel);
-                    const center = box.getCenter(new THREE.Vector3());
-                    bannerModel.position.sub(center);
-                    
-                    const size = box.getSize(new THREE.Vector3()).length();
-                    camera.position.z = size * 1.5;
-                    camera.position.y = -size * 0.001;
-                    
-                    if (gltf.animations && gltf.animations.length) {
-                        mixer = new THREE.AnimationMixer(bannerModel);
-                        gltf.animations.forEach(clip => {
-                            mixer.clipAction(clip).play();
-                        });
-                    }
-                    
-                    const controls = new THREE.OrbitControls(camera, renderer.domElement);
-                    controls.enableDamping = true;
-                    controls.dampingFactor = 0.05;
-                    controls.minDistance = size * 0.2;
-                    controls.maxDistance = size * 0.1;
-                    controls.maxPolarAngle = Math.PI * 0.7;
-                    controls.minPolarAngle = Math.PI * 0.3;
-                    controls.autoRotate = true;
-                    controls.autoRotateSpeed = 0.7;
-                    controls.target.y = -0.3;
-                    
-                    const clock = new THREE.Clock();
-                    function animate() {
-                        requestAnimationFrame(animate);
-                        const delta = clock.getDelta();
-                        controls.update();
-                        if (mixer) mixer.update(delta);
-                        renderer.render(scene, camera);
-                    }
-                    animate();
-                },
-                undefined,
-                function(error) {
-                    console.error('Error loading banner model:', error);
-                    const geometry = new THREE.TorusKnotGeometry(1, 0.4, 100, 16);
-                    const material = new THREE.MeshStandardMaterial({ 
-                        color: 0xe74c3c,
-                        metalness: 0.7,
-                        roughness: 0.3
-                    });
-                    const knot = new THREE.Mesh(geometry, material);
-                    scene.add(knot);
-                    camera.position.z = 5;
-                    camera.position.y = -1;
-                    
-                    const controls = new THREE.OrbitControls(camera, renderer.domElement);
-                    controls.enableDamping = true;
-                    
-                    function animate() {
-                        requestAnimationFrame(animate);
-                        knot.rotation.x += 0.005;
-                        knot.rotation.y += 0.005;
-                        controls.update();
-                        renderer.render(scene, camera);
-                    }
-                    animate();
-                }
-            );
-            
-            function onWindowResize() {
-                camera.aspect = container.clientWidth / container.clientHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(container.clientWidth, container.clientHeight);
-            }
-            window.addEventListener('resize', onWindowResize);
-            onWindowResize();
-            
-            // Add smooth scroll to content
-            document.querySelector('.scroll-indicator').addEventListener('click', () => {
-                document.querySelector('.content-section').scrollIntoView({ 
-                    behavior: 'smooth' 
-                });
             });
+        }
+
+        // Main Banner Animation with Enhanced Effects
+        async function initBanner() {
+            try {
+                // Show loading overlay
+                const loadingOverlay = document.getElementById('loading-overlay');
+                
+                // Load the GLB model first
+                const gltf = await loadGLBModel();
+                
+                // Scene setup
+                const container = document.getElementById('banner-container');
+                const canvas = document.getElementById('banner-canvas');
+                
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(
+                    45, // Wider field of view
+                    container.clientWidth / container.clientHeight, 
+                    0.1, 
+                    1000
+                );
+                
+                const renderer = new THREE.WebGLRenderer({
+                    canvas: canvas,
+                    antialias: true,
+                    alpha: true
+                });
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                renderer.outputEncoding = THREE.sRGBEncoding;
+                
+                // Add skybox/environment
+                function createSkybox() {
+                    const skyGeometry = new THREE.SphereGeometry(500, 32, 32);
+                    const skyMaterial = new THREE.MeshBasicMaterial({
+                        color: 0x87CEEB, // Light sky blue color
+                        side: THREE.BackSide,
+                        fog: true
+                    });
+                    const sky = new THREE.Mesh(skyGeometry, skyMaterial);
+                    scene.add(sky);
+                    
+                    // Lighter blue fog to match the sky
+                    scene.fog = new THREE.FogExp2(0x87CEEB, 0.001);
+                }
+                createSkybox();
+
+                // Enhanced lighting setup with blue sky adaptation
+                function setupLighting() {
+                    // Brighter ambient light to match daytime
+                    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+                    scene.add(ambientLight);
+                    
+                    // Main sunlight - positioned higher for daytime feel
+                    const sunLight = new THREE.DirectionalLight(0xffffcc, 1.3); // Slightly yellow tint
+                    sunLight.position.set(1, 2, 1); // Higher position
+                    sunLight.castShadow = true;
+                    sunLight.shadow.mapSize.width = 1024;
+                    sunLight.shadow.mapSize.height = 1024;
+                    scene.add(sunLight);
+                    
+                    // Fill light - softer and cooler
+                    const fillLight = new THREE.DirectionalLight(0xccddff, 0.4);
+                    fillLight.position.set(-1, 0.5, -1);
+                    scene.add(fillLight);
+                    
+                    // Back light - reduced intensity
+                    const backLight = new THREE.DirectionalLight(0xffffff, 0.2);
+                    backLight.position.set(0, 0.5, -1);
+                    scene.add(backLight);
+                    
+                    // Hemisphere light - sky blue and light ground
+                    const hemisphereLight = new THREE.HemisphereLight(
+                        0x87CEEB, // Sky color
+                        0xdfebf2, // Light ground color (off-white with blue tint)
+                        0.8 // Increased intensity
+                    );
+                    scene.add(hemisphereLight);
+                }
+                setupLighting();
+                
+                // Add the loaded model to the scene
+                const bannerModel = gltf.scene;
+                scene.add(bannerModel);
+                
+                const box = new THREE.Box3().setFromObject(bannerModel);
+                const center = box.getCenter(new THREE.Vector3());
+                bannerModel.position.sub(center);
+                
+                const size = box.getSize(new THREE.Vector3()).length();
+                camera.position.z = size * 1.5;
+                camera.position.y = -size * 0.001;
+                
+                let mixer;
+                if (gltf.animations && gltf.animations.length) {
+                    mixer = new THREE.AnimationMixer(bannerModel);
+                    gltf.animations.forEach(clip => {
+                        mixer.clipAction(clip).play();
+                    });
+                }
+                
+                const controls = new THREE.OrbitControls(camera, renderer.domElement);
+                controls.enableDamping = true;
+                controls.dampingFactor = 0.05;
+                controls.minDistance = size * 0.2;
+                controls.maxDistance = size * 0.1;
+                controls.maxPolarAngle = Math.PI * 0.7;
+                controls.minPolarAngle = Math.PI * 0.3;
+                controls.autoRotate = true;
+                controls.autoRotateSpeed = 0.7;
+                controls.target.y = -0.3;
+                
+                const clock = new THREE.Clock();
+                function animate() {
+                    requestAnimationFrame(animate);
+                    const delta = clock.getDelta();
+                    controls.update();
+                    if (mixer) mixer.update(delta);
+                    renderer.render(scene, camera);
+                }
+                animate();
+                
+                function onWindowResize() {
+                    camera.aspect = container.clientWidth / container.clientHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(container.clientWidth, container.clientHeight);
+                }
+                window.addEventListener('resize', onWindowResize);
+                onWindowResize();
+                
+                // Add smooth scroll to content
+                document.querySelector('.scroll-indicator').addEventListener('click', () => {
+                    document.querySelector('.content-section').scrollIntoView({ 
+                        behavior: 'smooth' 
+                    });
+                });
+                
+                // Hide loading overlay when everything is ready
+                loadingOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                }, 500);
+                
+            } catch (error) {
+                console.error('Error initializing banner:', error);
+                // Fallback content if loading fails
+                const loadingOverlay = document.getElementById('loading-overlay');
+                loadingOverlay.innerHTML = `
+                    <h2>Welcome to T7 Clan</h2>
+                    <p>Competitive tournaments and clan activities</p>
+                    <button onclick="location.reload()">Retry Loading</button>
+                `;
+            }
         }
         
         // Events Section
         function initEvents() {
             const upcomingEvents = [
-                
                 {
                     title: "Seasonal Championship 2025",
                     type: "Tournament",
                     date: "June, 2025",
-                    details: "Annual  tournament with 16 competing players. single elimination bracket.",
+                    details: "Annual tournament with 16 competing players. Single elimination bracket.",
                     participants: "16",
                     prize: "Championship",
                     icon: "fa-trophy"
-                },
-                
+                }
             ];
             
             const pastEvents = [
-    {
-        title: "Seasonal Championship 2023",
-        type: "Tournament",
-        date: "December 28, 2023",
-        details: "Seasonal championship with 16 Clan members. 1v1 Tournament with 5K N1 Coins Won Diglet Sencond Place T7 coder Won 3.5K N1 coins and third place T7| randy won 2k N1 Coin",
-        participants: "16",
-        prize: "Victory",
-        icon: "fa-trophy"
-    },
-    {
-        title: "Clan War: T7 vs Fossile Clan",
-        type: "Clan War",
-        date: "December, 2023",
-        details: "Epic 3v3 showdown that went to sudden death overtime. Talent 7 won.",
-        participants: "6",
-        prize: "Victory",
-        icon: "fa-swords" 
-    },
-    {
-        title: "ARCHERS OF THE REALM",
-        type: "Strategic Event",
-        date: "August, 2024",
-        details: "King vs King bow battle with 4 defenders protecting their ruler. Attackers must eliminate defenders before taking down the king. Intense 10-minute matches.",
-        participants: "10",
-        prize: "Victory",
-        icon: "fa-crown" 
-    },
-    {
-        title: "Clan War: Talent7 vs 2 shots Clan",
-        type: "Clan War",
-        date: "December, 2023",
-        details: "Epic 3v3 showdown that went to sudden death overtime. 2 shots won.",
-        participants: "12",
-        prize: "Victory",
-        icon: "fa-swords" 
-    },
-    {
-        title: "ARCHERY OLYMPICS",
-        type: "Public Event",
-        date: "October 15, 2024",
-        details: "6 Epic Rounds With 6 Bows.",
-        participants: "12",
-        prize: "Victory",
-        icon: "fa-bullseye" 
-    },
-    {
-        title: "Seasonal Championship 2024",
-        type: "Tournament",
-        date: "March 20, 2024",
-        details: "Single elimination 1v1 tournament. T7|Kitten Won Tournament And T7|Lichtel are Runner-UP",
-        participants: "16",
-        prize: "Champion",
-        icon: "fa-trophy"
-    },
-    {
-        title: "The Lost City of Eldarath",
-        type: "Adventure Event",
-        date: "January, 2024",
-        details: "1 vs. monster event! Participants battled through castles, forts, and fields across 3 waves. The first 3 kills advanced players to the next level.",
-        participants: "10",
-        prize: "Champion",
-        icon: "fa-dungeon" 
-    }
-];
+                {
+                    title: "Seasonal Championship 2023",
+                    type: "Tournament",
+                    date: "December 28, 2023",
+                    details: "Seasonal championship with 16 Clan members. 1v1 Tournament with 5K N1 Coins Won Diglet Sencond Place T7 coder Won 3.5K N1 coins and third place T7| randy won 2k N1 Coin",
+                    participants: "16",
+                    prize: "Victory",
+                    icon: "fa-trophy"
+                },
+                {
+                    title: "Clan War: T7 vs Fossile Clan",
+                    type: "Clan War",
+                    date: "December, 2023",
+                    details: "Epic 3v3 showdown that went to sudden death overtime. Talent 7 won.",
+                    participants: "6",
+                    prize: "Victory",
+                    icon: "fa-swords" 
+                },
+                {
+                    title: "ARCHERS OF THE REALM",
+                    type: "Strategic Event",
+                    date: "August, 2024",
+                    details: "King vs King bow battle with 4 defenders protecting their ruler. Attackers must eliminate defenders before taking down the king. Intense 10-minute matches.",
+                    participants: "10",
+                    prize: "Victory",
+                    icon: "fa-crown" 
+                },
+                {
+                    title: "Clan War: Talent7 vs 2 shots Clan",
+                    type: "Clan War",
+                    date: "December, 2023",
+                    details: "Epic 3v3 showdown that went to sudden death overtime. 2 shots won.",
+                    participants: "12",
+                    prize: "Victory",
+                    icon: "fa-swords" 
+                },
+                {
+                    title: "ARCHERY OLYMPICS",
+                    type: "Public Event",
+                    date: "October 15, 2024",
+                    details: "6 Epic Rounds With 6 Bows.",
+                    participants: "12",
+                    prize: "Victory",
+                    icon: "fa-bullseye" 
+                },
+                {
+                    title: "Seasonal Championship 2024",
+                    type: "Tournament",
+                    date: "March 20, 2024",
+                    details: "Single elimination 1v1 tournament. T7|Kitten Won Tournament And T7|Lichtel are Runner-UP",
+                    participants: "16",
+                    prize: "Champion",
+                    icon: "fa-trophy"
+                },
+                {
+                    title: "The Lost City of Eldarath",
+                    type: "Adventure Event",
+                    date: "January, 2024",
+                    details: "1 vs. monster event! Participants battled through castles, forts, and fields across 3 waves. The first 3 kills advanced players to the next level.",
+                    participants: "10",
+                    prize: "Champion",
+                    icon: "fa-dungeon" 
+                }
+            ];
             
             function createEventCard(event, isPast = false) {
                 const card = document.createElement('div');
@@ -661,9 +705,10 @@
             });
         }
         
-        window.addEventListener('DOMContentLoaded', () => {
-            initBanner();
-            initEvents();
+        // Initialize everything when the page loads
+        window.addEventListener('DOMContentLoaded', async () => {
+            await initBanner(); // Wait for the banner to load first
+            initEvents(); // Then initialize the events
         });
     </script>
 </body>

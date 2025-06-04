@@ -340,7 +340,7 @@
         
         <h2>Past Events & Results</h2>
         <div class="events-grid" id="past-events-container">
-            <!-- Past event cards will be added dynamically -->
+           
         </div>
     </div>
 
@@ -534,42 +534,17 @@
         // Events Section
         function initEvents() {
             const upcomingEvents = [
+                
                 {
-                    title: "Clan War: T7 vs Shadow",
-                    type: "Clan War",
-                    date: "June 15, 2023",
-                    details: "Intense 5v5 battle against our rivals Shadow clan. Map: Ancient Ruins. Best of 7 matches.",
-                    participants: "10",
-                    prize: "Prestige + $100",
-                    icon: "fa-users"
-                },
-                {
-                    title: "Summer Showdown Tournament",
+                    title: "Seasonal Championship 2025",
                     type: "Tournament",
-                    date: "June 22-24, 2023",
-                    details: "Annual summer tournament with 32 competing teams. Double elimination bracket.",
-                    participants: "32",
-                    prize: "Championship + $500",
+                    date: "June, 2025",
+                    details: "Annual  tournament with 16 competing players. single elimination bracket.",
+                    participants: "16",
+                    prize: "Championship",
                     icon: "fa-trophy"
                 },
-                {
-                    title: "Public FFA Event",
-                    type: "Public Event",
-                    date: "June 18, 2023",
-                    details: "Open free-for-all event for all community members. Special modifiers enabled.",
-                    participants: "Unlimited",
-                    prize: "Exclusive Skins",
-                    icon: "fa-gamepad"
-                },
-                {
-                    title: "Clan War: T7 vs Phoenix",
-                    type: "Clan War",
-                    date: "July 5, 2023",
-                    details: "Strategic 4v4 capture point battle. Map: Industrial Zone.",
-                    participants: "8",
-                    prize: "Prestige + Ranking",
-                    icon: "fa-users"
-                }
+                
             ];
             
             const pastEvents = [
@@ -686,7 +661,6 @@
             });
         }
         
-        // Initialize everything when the page loads
         window.addEventListener('DOMContentLoaded', () => {
             initBanner();
             initEvents();
